@@ -43,7 +43,9 @@ public abstract class MergefieldBufferedRegion
 
     private static final String W_P = "w:p";
 
-    private static final String MERGEFORMAT = "\\* MERGEFORMAT";
+    private static final String START_MERGEFORMAT = "\\*";
+    
+    private static final String MERGEFORMAT = "MERGEFORMAT";
 
     private static final String MERGEFIELD_FIELD_TYPE = "MERGEFIELD";
 
@@ -136,9 +138,19 @@ public abstract class MergefieldBufferedRegion
             if ( StringUtils.isNotEmpty( fieldName ) )
             {
                 // Test if fieldName ends with \* MERGEFORMAT
-                if ( fieldName.endsWith( MERGEFORMAT ) )
+            	// sometimes \* MERGEFORMAT is splitted in several w:instrText
+            	// ex : 
+            	// <w:r><w:instrText xml:space="preserve"> MERGEFIELD ${acuOther.cond} \* MER</w:instrText></w:r>
+            	// <w:r><w:instrText xml:space="preserve">GEFORMAT </w:instrText></w:r>
+            	//
+            	// see https://github.com/dnmd/xdocreport/blob/master/Issue42.java
+            	int mergeFormatIndex = fieldName.lastIndexOf(START_MERGEFORMAT);
+                if ( mergeFormatIndex != -1 )
                 {
-                    fieldName = fieldName.substring( 0, fieldName.length() - MERGEFORMAT.length() ).trim();
+                	String mergeformat = fieldName.substring(mergeFormatIndex + START_MERGEFORMAT.length(), fieldName.length()).trim();
+                	if (MERGEFORMAT.startsWith(mergeformat)) {
+                		fieldName = fieldName.substring( 0, mergeFormatIndex ).trim();
+                	}
                 }
                 if ( StringUtils.isNotEmpty( fieldName ) )
                 {
@@ -169,7 +181,12 @@ public abstract class MergefieldBufferedRegion
                     // to have [#if 'a' = "one"]1[#else]not 1[/#if]
                     fieldName = StringUtils.xmlUnescape( fieldName );
 
-                    if ( fieldAsTextStyling != null )
+                    FieldMetadata fieldMetadata = fieldAsTextStyling;
+                    if ( fieldMetadata == null ) {
+                        fieldMetadata = handler.getFieldAsTextStyling(fieldName);
+                    }
+
+                    if ( fieldMetadata != null )
                     {
                         // Find parent paragraph
                         BufferedElement parent = mergefield.findParent( W_P );
@@ -191,8 +208,8 @@ public abstract class MergefieldBufferedRegion
                         // Set
                         String setVariableDirective =
                             formatter.formatAsCallTextStyling( variableIndex, fieldName, DocumentKind.DOCX.name(),
-                                                               fieldAsTextStyling.getSyntaxKind(),
-                                                               fieldAsTextStyling.isSyntaxWithDirective(), elementId,
+                                                               fieldMetadata.getSyntaxKind(),
+                                                               fieldMetadata.isSyntaxWithDirective(), elementId,
                                                                handler.getEntryName() );
 
                         String textBefore =

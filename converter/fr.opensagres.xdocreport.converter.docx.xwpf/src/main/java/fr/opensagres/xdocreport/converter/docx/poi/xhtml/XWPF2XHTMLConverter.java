@@ -28,17 +28,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.logging.Logger;
 
-import org.apache.poi.xwpf.converter.xhtml.XHTMLConverter;
-import org.apache.poi.xwpf.converter.xhtml.XHTMLOptions;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
+import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLConverter;
+import fr.opensagres.poi.xwpf.converter.xhtml.XHTMLOptions;
 import fr.opensagres.xdocreport.converter.IURIResolver;
 import fr.opensagres.xdocreport.converter.MimeMapping;
 import fr.opensagres.xdocreport.converter.MimeMappingConstants;
 import fr.opensagres.xdocreport.converter.Options;
 import fr.opensagres.xdocreport.converter.OptionsHelper;
 import fr.opensagres.xdocreport.converter.XDocConverterException;
-import fr.opensagres.xdocreport.converter.docx.poi.itext.XWPF2PDFViaITextConverter;
 import fr.opensagres.xdocreport.converter.internal.AbstractConverterNoEntriesSupport;
 import fr.opensagres.xdocreport.core.logging.LogUtils;
 
@@ -52,7 +51,7 @@ public class XWPF2XHTMLConverter
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = LogUtils.getLogger( XWPF2PDFViaITextConverter.class.getName() );
+    private static final Logger LOGGER = LogUtils.getLogger( XWPF2XHTMLConverter.class.getName() );
 
     public static XWPF2XHTMLConverter getInstance()
     {
@@ -89,7 +88,7 @@ public class XWPF2XHTMLConverter
         final IURIResolver resolver = OptionsHelper.getURIResolver( options );
         if ( resolver != null )
         {
-            xhtmlOptions.URIResolver( new org.apache.poi.xwpf.converter.core.IURIResolver()
+            xhtmlOptions.URIResolver( new fr.opensagres.poi.xwpf.converter.core.IURIResolver()
             {
                 public String resolve( String uri )
                 {

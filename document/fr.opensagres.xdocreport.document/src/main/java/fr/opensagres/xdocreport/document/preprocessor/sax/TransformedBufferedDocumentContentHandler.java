@@ -24,6 +24,8 @@
  */
 package fr.opensagres.xdocreport.document.preprocessor.sax;
 
+import static java.util.Collections.singletonList;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -149,7 +151,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
 
     /**
      * If a row parsing, replace fields name with well script to manage lazy loop for table row.
-     * 
+     *
      * @param content
      * @return
      */
@@ -161,7 +163,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
 
     /**
      * If a row parsing, replace fields name with well script to manage lazy loop for table row.
-     * 
+     *
      * @param content
      * @return
      */
@@ -234,10 +236,38 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
     {
         return directives;
     }
+    
+    /**
+     * Returns the before table token.
+     *
+     * @return
+     */
+    protected String getBeforeTableToken()
+    {
+        if ( fieldsMetadata == null )
+        {
+            return FieldsMetadata.DEFAULT_BEFORE_TABLE_TOKEN;
+        }
+        return fieldsMetadata.getBeforeTableToken();
+    }
+
+    /**
+     * Returns the after table token.
+     *
+     * @return
+     */
+    protected String getAfterTableToken()
+    {
+        if ( fieldsMetadata == null )
+        {
+            return FieldsMetadata.DEFAULT_AFTER_TABLE_TOKEN;
+        }
+        return fieldsMetadata.getAfterTableToken();
+    }
 
     /**
      * Returns the before row token.
-     * 
+     *
      * @return
      */
     protected String getBeforeRowToken()
@@ -251,7 +281,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
 
     /**
      * Returns the after row token.
-     * 
+     *
      * @return
      */
     protected String getAfterRowToken()
@@ -265,7 +295,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
 
     /**
      * Returns the before row token.
-     * 
+     *
      * @return
      */
     protected String getBeforeTableCellToken()
@@ -279,7 +309,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
 
     /**
      * Returns the after row token.
-     * 
+     *
      * @return
      */
     protected String getAfterTableCellToken()
@@ -312,7 +342,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
 
     /**
      * Returns true if current element is a table and false otherwise.
-     * 
+     *
      * @param uri
      * @param localName
      * @param name
@@ -322,6 +352,8 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
     {
         return bufferedDocument.isTable( uri, localName, name );
     }
+    
+    protected abstract String getTableTableName();
 
     protected abstract String getTableRowName();
 
@@ -329,7 +361,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
 
     /**
      * Returns true if current element is a table row and false otherwise.
-     * 
+     *
      * @param uri
      * @param localName
      * @param name
@@ -350,7 +382,11 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
         String beforeElementName = fieldName.substring( 0, index );
         if ( StringUtils.isNotEmpty( beforeElementName ) )
         {
-            if ( beforeElementName.equals( getBeforeRowToken() ) )
+        	if ( beforeElementName.equals( getBeforeTableToken() ) )
+            {
+                beforeElementName = getTableTableName();
+            }
+        	else if ( beforeElementName.equals( getBeforeRowToken() ) )
             {
                 beforeElementName = getTableRowName();
             }
@@ -362,7 +398,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
             {
                 beforeElementName = beforeElementName.substring( BEFORE_TOKEN.length(), beforeElementName.length() );
             }
-            BufferedElement elementInfo = super.findParentElementInfo( beforeElementName );
+            BufferedElement elementInfo = super.findParentElementInfo( singletonList( beforeElementName ) );
             if ( elementInfo == null )
             {
                 return false;
@@ -385,6 +421,10 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
         {
             if ( formatter == null )
             {
+            	if ( fieldName.startsWith( getBeforeTableToken() ) )
+                {
+                    return getBeforeTableToken().length();
+                }
                 if ( fieldName.startsWith( getBeforeRowToken() ) )
                 {
                     return getBeforeRowToken().length();
@@ -395,7 +435,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
                 }
                 return -1;
             }
-            if ( !( fieldName.startsWith( BEFORE_TOKEN ) || fieldName.startsWith( getBeforeRowToken() ) || fieldName.startsWith( getBeforeTableCellToken() ) ) )
+            if ( !( fieldName.startsWith( BEFORE_TOKEN ) || fieldName.startsWith( getBeforeTableToken() ) || fieldName.startsWith( getBeforeRowToken() ) || fieldName.startsWith( getBeforeTableCellToken() ) ) )
             {
                 return -1;
             }
@@ -405,6 +445,10 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
         {
             if ( formatter == null )
             {
+            	if ( fieldName.startsWith( getAfterTableToken() ) )
+                {
+                    return getAfterTableToken().length();
+                }
                 if ( fieldName.startsWith( getAfterRowToken() ) )
                 {
                     return getAfterRowToken().length();
@@ -415,7 +459,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
                 }
                 return -1;
             }
-            if ( !( fieldName.startsWith( AFTER_TOKEN ) || fieldName.startsWith( getAfterRowToken() ) || fieldName.startsWith( getAfterTableCellToken() ) ) )
+            if ( !( fieldName.startsWith( AFTER_TOKEN ) || fieldName.startsWith( getAfterTableToken() ) || fieldName.startsWith( getAfterRowToken() ) || fieldName.startsWith( getAfterTableCellToken() ) ) )
             {
                 return -1;
             }
@@ -433,7 +477,11 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
         String afterElementName = fieldName.substring( 0, index );
         if ( StringUtils.isNotEmpty( afterElementName ) )
         {
-            if ( afterElementName.equals( getAfterRowToken() ) )
+        	if ( afterElementName.equals( getAfterTableToken() ) )
+            {
+                afterElementName = getTableTableName();
+            }
+        	else if ( afterElementName.equals( getAfterRowToken() ) )
             {
                 afterElementName = getTableRowName();
             }
@@ -445,7 +493,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
             {
                 afterElementName = afterElementName.substring( AFTER_TOKEN.length(), afterElementName.length() );
             }
-            BufferedElement elementInfo = super.findParentElementInfo( afterElementName );
+            BufferedElement elementInfo = super.findParentElementInfo( singletonList( afterElementName ) );
             if ( elementInfo == null )
             {
                 return false;
@@ -489,14 +537,7 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
     {
         if ( formatter != null && fieldsMetadata != null )
         {
-            Collection<FieldMetadata> fieldsAsTextStyling = fieldsMetadata.getFieldsAsTextStyling();
-            for ( FieldMetadata field : fieldsAsTextStyling )
-            {
-                if ( content.contains( field.getFieldName() ) )
-                {
-                    return field;
-                }
-            }
+        	return fieldsMetadata.getFieldAsTextStyling(content);
         }
         return null;
     }
@@ -547,5 +588,6 @@ public abstract class TransformedBufferedDocumentContentHandler<Document extends
         return endNoParse;
     }
 
+    @Override
     protected abstract Document createDocument();
 }

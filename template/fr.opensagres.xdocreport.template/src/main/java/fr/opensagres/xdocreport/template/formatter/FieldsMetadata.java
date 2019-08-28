@@ -49,6 +49,10 @@ public class FieldsMetadata
 {
 
     public static final FieldsMetadata EMPTY = new FieldsMetadata();
+    
+    public static final String DEFAULT_BEFORE_TABLE_TOKEN = "@before-table";
+
+    public static final String DEFAULT_AFTER_TABLE_TOKEN = "@after-table";
 
     public static final String DEFAULT_BEFORE_ROW_TOKEN = "@before-row";
 
@@ -68,6 +72,10 @@ public class FieldsMetadata
 
     protected final Map<String, FieldMetadata> fieldsAsTextStyling;
 
+    private String beforeTableToken;
+
+    private String afterTableToken;   
+    
     private String beforeRowToken;
 
     private String afterRowToken;
@@ -110,6 +118,8 @@ public class FieldsMetadata
         this.fieldsAsList = new HashMap<String, FieldMetadata>();
         this.fieldsAsImage = new HashMap<String, FieldMetadata>();
         this.fieldsAsTextStyling = new HashMap<String, FieldMetadata>();
+        this.beforeTableToken = DEFAULT_BEFORE_TABLE_TOKEN;
+        this.afterTableToken = DEFAULT_AFTER_TABLE_TOKEN;
         this.beforeRowToken = DEFAULT_BEFORE_ROW_TOKEN;
         this.afterRowToken = DEFAULT_AFTER_ROW_TOKEN;
         this.beforeTableCellToken = DEFAULT_BEFORE_TABLE_CELL_TOKEN;
@@ -258,6 +268,9 @@ public class FieldsMetadata
     public FieldMetadata addField( String fieldName, Boolean listType, String imageName, String syntaxKind,
                                    Boolean syntaxWithDirective )
     {
+        if(fieldName == null) {
+            throw new IllegalArgumentException("Argument 'fieldName' can not be null");
+        }
         // Test if it exists fields with the given name
         FieldMetadata exsitingField = getFieldAsImage( fieldName );
         if ( exsitingField == null )
@@ -351,6 +364,24 @@ public class FieldsMetadata
         }
         return sortedFieldsAsTextStyling;
     }
+    
+	/**
+	 * Returns the fields metadata as text styling from the given content and
+	 * null otherwise.
+	 * 
+	 * @param content
+	 * @return the fields metadata as text styling from the given content and
+	 *         null otherwise.
+	 */
+	public FieldMetadata getFieldAsTextStyling(String content) {
+		Collection<FieldMetadata> fieldsAsTextStyling = getFieldsAsTextStyling();
+		for (FieldMetadata field : fieldsAsTextStyling) {
+			if (content.contains(field.getFieldName())) {
+				return field;
+			}
+		}
+		return null;
+	}
 
     /**
      * Returns true if there are fields as image and false otherwise.
@@ -383,6 +414,26 @@ public class FieldsMetadata
             return metadata.getFieldName();
         }
         return null;
+    }
+    
+    public String getBeforeTableToken()
+    {
+        return beforeTableToken;
+    }
+
+    public void setBeforeTableToken( String beforeTableToken )
+    {
+        this.beforeTableToken = beforeTableToken;
+    }
+
+    public String getAfterTableToken()
+    {
+        return afterTableToken;
+    }
+
+    public void setAfterTableToken( String afterTableToken )
+    {
+        this.afterTableToken = afterTableToken;
     }
 
     public String getBeforeRowToken()

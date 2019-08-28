@@ -67,6 +67,7 @@ public class ConverterTest
 
         return options(
 
+        		CoreOptions.cleanCaches(),
                         // uncomment for "remote debugging"
         		//CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006"),
                         // equinox(),
@@ -83,23 +84,23 @@ public class ConverterTest
                         mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.xdocreport.converter.docx.xwpf" ).versionAsInProject().noStart(),
 
                         // 3rd parties extensions...
-                        mavenBundle( "fr.opensagres.xdocreport", "org.odftoolkit.odfdom.converter.core" ).versionAsInProject(),
-                        mavenBundle( "fr.opensagres.xdocreport", "org.odftoolkit.odfdom.converter.pdf" ).versionAsInProject(),
-                        mavenBundle( "fr.opensagres.xdocreport", "org.odftoolkit.odfdom.converter.xhtml" ).versionAsInProject(),
+                        mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.odfdom.converter.core" ).versionAsInProject(),
+                        mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.odfdom.converter.pdf" ).versionAsInProject(),
+                        mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.odfdom.converter.xhtml" ).versionAsInProject(),
                         mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.xdocreport.itext.extension" ).versionAsInProject(),
 
-                        mavenBundle( "fr.opensagres.xdocreport", "org.apache.poi.xwpf.converter.core" ).versionAsInProject(),
-                        mavenBundle( "fr.opensagres.xdocreport", "org.apache.poi.xwpf.converter.pdf" ).versionAsInProject(),
-                        mavenBundle( "fr.opensagres.xdocreport", "org.apache.poi.xwpf.converter.xhtml" ).versionAsInProject(),
+                        mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.poi.xwpf.converter.core" ).versionAsInProject(),
+                        mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.poi.xwpf.converter.pdf" ).versionAsInProject(),
+                        mavenBundle( "fr.opensagres.xdocreport", "fr.opensagres.poi.xwpf.converter.xhtml" ).versionAsInProject(),
                         // 3rd parties modules...
         				mavenBundle("org.slf4j", "slf4j-api", "1.6.1"),
 
         				mavenBundle("org.slf4j", "slf4j-simple", "1.6.1").noStart(),
-                        
-                        wrappedBundle( mavenBundle( "org.apache.poi", "poi", "3.8" ) ),
-                        wrappedBundle( mavenBundle( "org.apache.poi", "poi-ooxml", "3.8" ) ).exports("org.apache.poi.openxml4j.opc","org.apache.poi.xwpf.usermodel"),
+
+                        wrappedBundle( mavenBundle( "org.apache.poi", "poi", "4.0.1" ) ),
+                        wrappedBundle( mavenBundle( "org.apache.poi", "poi-ooxml", "4.0.1" ) ).exports("org.apache.poi.ooxml","org.apache.poi.openxml4j.opc","org.apache.poi.xwpf.usermodel"),
                         wrappedBundle( mavenBundle( "org.apache.servicemix.bundles", "org.apache.servicemix.bundles.xmlbeans", "2.4.0_5" ) ),
-                        wrappedBundle( mavenBundle( "org.apache.poi", "ooxml-schemas", "1.1" ) ),
+                        wrappedBundle( mavenBundle( "org.apache.poi", "ooxml-schemas", "1.4" ) ),
                         wrappedBundle( mavenBundle( "org.odftoolkit", "odfdom-java", "0.8.7" ) ),
                         wrappedBundle( mavenBundle( "com.lowagie", "itext", "2.1.7" ) )
 
